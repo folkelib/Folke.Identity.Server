@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{59FD27E1-6EE9-415F-85A3-04FB569DEDA6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D3B255D-E0F9-475C-B017-8BEF37875D91}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+		NuGet.Config = NuGet.Config
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Folke.Identity.Server", "src\Folke.Identity.Server\Folke.Identity.Server.xproj", "{97AB5561-D32B-4A19-87C2-B50E6509BA61}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97AB5561-D32B-4A19-87C2-B50E6509BA61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97AB5561-D32B-4A19-87C2-B50E6509BA61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97AB5561-D32B-4A19-87C2-B50E6509BA61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97AB5561-D32B-4A19-87C2-B50E6509BA61}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97AB5561-D32B-4A19-87C2-B50E6509BA61} = {59FD27E1-6EE9-415F-85A3-04FB569DEDA6}
+	EndGlobalSection
+EndGlobal

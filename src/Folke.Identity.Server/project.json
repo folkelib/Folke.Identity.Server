@@ -1,0 +1,16 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "Folke.Identity.Server Class Library",
+  "authors": [ "Sidoine" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "dependencies": {
+    "Elm.AspNet.Identity": "1.0.0-beta-*",
+    "Folke.Mvc.Extensions": "1.0.0-beta-*"
+  },
+
+  "frameworks": {
+      "dnx451": { }
+  }
+}
