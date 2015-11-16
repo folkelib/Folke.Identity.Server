@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Elm.AspNet.Identity;
 using Folke.Identity.Server.Enumeration;
 using Folke.Identity.Server.Services;
 using Folke.Identity.Server.Views;
@@ -16,37 +15,23 @@ namespace Folke.Identity.Server.Controllers
 {
     public abstract class BaseAuthenticationController<TUser, TKey, TUserView> : TypedControllerBase
          where TKey : IEquatable<TKey>
-         where TUser : IdentityUser<TUser, TKey>, new()
+         where TUser : class, new()
          where TUserView : BaseUserView<TKey>, new()
     {
         public IUserService<TUser> UserManager { get; set; }
         public SignInManager<TUser> SignInManager { get; set; }
-        public IUserEmailService<TUser, TKey> EmailService { get; set; }
+        public IUserEmailService<TUser> EmailService { get; set; }
 
-        protected BaseAuthenticationController(IUserService<TUser> userManager, SignInManager<TUser> signInManager, IUserEmailService<TUser, TKey> emailService)
+        protected BaseAuthenticationController(IUserService<TUser> userManager, SignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
         {
             UserManager = userManager;
             SignInManager = signInManager;
             EmailService = emailService;
         }
 
-        protected virtual TUserView MapToUserView(TUser user)
-        {
-            return new TUserView
-            {
-                Email = user.Email,
-                Id = user.Id,
-                EmailConfirmed = user.EmailConfirmed,
-                HasPassword = user.PasswordHash != null,
-                Logged = true,
-                UserName = user.UserName
-            };
-        }
-
-        protected virtual TUser CreateNewUser()
-        {
-            return new TUser();
-        }
+        protected abstract TUserView MapToUserView(TUser user);
+        
+        protected abstract TUser CreateNewUser(string userName, string email, bool emailConfirmed);
 
         [HttpPut("login")]
         public async Task<IHttpActionResult<LoginResultView>> Login([FromBody] LoginView loginView)
@@ -105,10 +90,8 @@ namespace Folke.Identity.Server.Controllers
                 return BadRequest<TUserView>(ModelState);
             }
 
-            var user = CreateNewUser();
-            user.UserName = registerView.Email;
-            user.Email = registerView.Email;
-
+            var user = CreateNewUser(registerView.Email, registerView.Email, false);
+            
             var result = await UserManager.CreateAsync(user, registerView.Password);
             if (!result.Succeeded)
             {
@@ -118,7 +101,7 @@ namespace Folke.Identity.Server.Controllers
             await SignInManager.SignInAsync(user, isPersistent: false);
 
             await EmailService.SendEmailConfirmationEmail(user);
-            return Created("GetAccount", user.Id, MapToUserView(user));
+            return Created("GetAccount", Convert.ChangeType(await UserManager.GetUserIdAsync(user), typeof(TKey)), MapToUserView(user));
         }
 
 
@@ -255,10 +238,7 @@ namespace Folke.Identity.Server.Controllers
             while (await UserManager.FindByNameAsync(userName) != null)
                 userName += "_";
             var email = loginInfo.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
-            var user = CreateNewUser();
-            user.UserName = userName;
-            user.Email = email;
-            user.EmailConfirmed = true;
+            var user = CreateNewUser(userName, email, true);
             var creationResult = await UserManager.CreateAsync(user);
             if (creationResult.Succeeded)
             {

@@ -6,7 +6,7 @@
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "Elm.AspNet.Identity": "1.0.0-beta-*",
+    "Microsoft.AspNet.Identity": "3.0.0-beta8",
     "Folke.Mvc.Extensions": "1.0.0-beta-*"
   },
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Elm.AspNet.Identity;
-using Folke.Elm;
 using Folke.Identity.Server.Services;
 using Folke.Identity.Server.Views;
 using Folke.Mvc.Extensions;
@@ -13,16 +11,14 @@ namespace Folke.Identity.Server.Controllers
 {
     public class BaseUserController<TUser, TKey> : TypedControllerBase
         where TKey : IEquatable<TKey>
-        where TUser : IdentityUser<TUser, TKey>
+        where TUser : class
     {
-        protected IFolkeConnection Connection { get; set; }
         protected IUserService<TUser> UserManager { get; set; }
         protected IUserSignInManager<TUser> SignInManager { get; set; }
-        protected IUserEmailService<TUser, TKey> EmailService { get; set; }
+        protected IUserEmailService<TUser> EmailService { get; set; }
 
-        public BaseUserController(IFolkeConnection connection, IUserService<TUser> userManager, IUserSignInManager<TUser> signInManager, IUserEmailService<TUser, TKey> emailService)
+        public BaseUserController(IUserService<TUser> userManager, IUserSignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
         {
-            Connection = connection;
             UserManager = userManager;
             SignInManager = signInManager;
             EmailService = emailService;

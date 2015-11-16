@@ -1,4 +1,4 @@
-﻿Adds MVC 6 Web API that allows to authenticate with a Single Page Application using Elm.AspNet.Identity.
+﻿Adds MVC 6 Web API that allows to authenticate with a Single Page Application using Microsoft.AspNet.Identity.
 
 /*,
       "dnxcore50": {
