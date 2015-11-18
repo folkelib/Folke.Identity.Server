@@ -2,7 +2,7 @@
 using Folke.Identity.Server.Services;
 using Microsoft.AspNet.Identity;
 
-namespace Microsoft.Framework.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IdentityServerServiceCollectionExtensions
     {

@@ -6,11 +6,21 @@
   "projectUrl": "",
   "licenseUrl": "",
   "dependencies": {
-    "Microsoft.AspNet.Identity": "3.0.0-beta8",
+    "Microsoft.AspNet.Identity": "3.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-rc1-final",
     "Folke.Mvc.Extensions": "1.0.0-beta-*"
   },
 
   "frameworks": {
-      "dnx451": { }
+    "dnx451": { },
+    "dnxcore50": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-*",
+        "System.Collections": "4.0.11-beta-*",
+        "System.Linq": "4.0.1-beta-*",
+        "System.Runtime": "4.0.21-beta-*",
+        "System.Threading": "4.0.11-beta-*"
+      }
+    }
   }
 }

@@ -1,3 +1,4 @@
 .vs
 *.lock.json
 *.user
+*.v2.ncrunchsolution
