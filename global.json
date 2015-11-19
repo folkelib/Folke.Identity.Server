@@ -1,5 +1,5 @@
 {
-  "projects": [ "src", "test", "../Folke.Mvc.Extensions/src" ],
+  "projects": [ "src", "test", "../Folke.Mvc.Extensions/src", "../Elm.AspNet.Identity/src" ],
   "sdk": {
     "version": "1.0.0-rc1-final"
   }

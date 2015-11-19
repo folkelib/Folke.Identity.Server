@@ -1,10 +1,10 @@
 ﻿{
   "version": "1.0.0-*",
-  "description": "Folke.Identity.Server Class Library",
+  "description": "MVC 6 base controllers that expose ASP.NET Identity Web API for a Single Page Application",
   "authors": [ "Sidoine" ],
   "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "projectUrl": "https://github.com/folkelib/Folke.Identity.Server",
+  "licenseUrl": "http://opensource.org/licenses/MIT",
   "dependencies": {
     "Microsoft.AspNet.Identity": "3.0.0-rc1-final",
     "Microsoft.AspNet.Mvc.Abstractions": "6.0.0-rc1-final",
@@ -12,8 +12,8 @@
   },
 
   "frameworks": {
-    "dnx451": { },
-    "dnxcore50": {
+    "net451": { },
+    "dotnet5.4": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-beta-*",
         "System.Collections": "4.0.11-beta-*",
