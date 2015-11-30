@@ -9,23 +9,23 @@ using Microsoft.AspNet.Mvc;
 
 namespace Folke.Identity.Server.Controllers
 {
-    public class BaseUserController<TUser, TKey> : TypedControllerBase
+    public class BaseUserController<TUser, TUserView, TKey> : TypedControllerBase
         where TKey : IEquatable<TKey>
+        where TUserView : class
         where TUser : class
     {
-        protected IUserService<TUser> UserManager { get; set; }
+        protected IUserService<TUser, TUserView> UserService { get; set; }
         protected IUserSignInManager<TUser> SignInManager { get; set; }
         protected IUserEmailService<TUser> EmailService { get; set; }
 
-        public BaseUserController(IUserService<TUser> userManager, IUserSignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
+        public BaseUserController(IUserService<TUser, TUserView> userService, IUserSignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
         {
-            UserManager = userManager;
+            UserService = userService;
             SignInManager = signInManager;
             EmailService = emailService;
         }
         
-        [Route("password")]
-        [HttpPut]
+        [HttpPut("password")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordView view)
         {
             if (!ModelState.IsValid)
@@ -34,7 +34,7 @@ namespace Folke.Identity.Server.Controllers
             }
             var account = await GetCurrentUserAsync();
             var result =
-                await UserManager.ChangePasswordAsync(account, view.OldPassword, view.NewPassword);
+                await UserService.ChangePasswordAsync(account, view.OldPassword, view.NewPassword);
             if (result.Succeeded)
             {
                 await SignInManager.SignInAsync(account, isPersistent: false);
@@ -44,14 +44,13 @@ namespace Folke.Identity.Server.Controllers
             return HttpBadRequest(ModelState);
         }
 
-        [HttpPost]
-        [Route("password")]
+        [HttpPost("password")]
         public async Task<IActionResult> SetPassword([FromBody]SetPasswordView model)
         {
             if (ModelState.IsValid)
             {
                 var account = await GetCurrentUserAsync();
-                var result = await UserManager.AddPasswordAsync(account, model.NewPassword);
+                var result = await UserService.AddPasswordAsync(account, model.NewPassword);
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(account, isPersistent: false);
@@ -62,14 +61,13 @@ namespace Folke.Identity.Server.Controllers
             return HttpBadRequest(ModelState);
         }
 
-        [HttpPut]
-        [Route("email")]
+        [HttpPut("email")]
         public async Task<IActionResult> SetEmail([FromBody] SetEmailView model)
         {
             if (ModelState.IsValid)
             {
                 var account = await GetCurrentUserAsync();
-                var result = await UserManager.SetEmailAsync(account, model.Email);
+                var result = await UserService.SetEmailAsync(account, model.Email);
                 if (result.Succeeded)
                 {
                     await EmailService.SendEmailConfirmationEmail(account);
@@ -80,11 +78,17 @@ namespace Folke.Identity.Server.Controllers
             return HttpBadRequest(ModelState);
         }
 
+        [HttpGet("me")]
+        public async Task<IHttpActionResult<TUserView>> GetMe()
+        {
+            return Ok(UserService.MapToUserView(await GetCurrentUserAsync()));
+        }
+
         [NonAction]
         protected async Task<TUser> GetCurrentUserAsync()
         {
             if (!HttpContext.User.Identity.IsAuthenticated) return null;
-            return await UserManager.FindByIdAsync(HttpContext.User.GetUserId());
+            return await UserService.FindByIdAsync(HttpContext.User.GetUserId());
         }
 
         private void AddErrors(IdentityResult result)

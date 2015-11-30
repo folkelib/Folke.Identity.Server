@@ -5,11 +5,13 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using Folke.Identity.Server.Views;
 
 namespace Folke.Identity.Server.Services
 {
-    public interface IUserService<TUser>
-         where TUser : class
+    public interface IUserService<TUser, TUserView>
+        where TUser : class
+        where TUserView : class
     {
         Task<string> GenerateConcurrencyStampAsync(TUser user);
         Task<IdentityResult> CreateAsync(TUser user);
@@ -92,5 +94,7 @@ namespace Folke.Identity.Server.Services
         bool SupportsUserLockout { get; }
         bool SupportsQueryableUsers { get; }
         IQueryable<TUser> Users { get; }
+        TUserView MapToUserView(TUser user);
+        TUser CreateNewUser(string userName, string email, bool emailConfirmed);
     }
 }
