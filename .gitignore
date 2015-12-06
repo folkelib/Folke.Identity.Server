@@ -2,3 +2,4 @@
 *.lock.json
 *.user
 *.v2.ncrunchsolution
+artifacts

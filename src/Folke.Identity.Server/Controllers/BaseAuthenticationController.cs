@@ -10,6 +10,7 @@ using Folke.Identity.Server.Views;
 using Folke.Mvc.Extensions;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Folke.Identity.Server.Controllers
 {
@@ -18,12 +19,14 @@ namespace Folke.Identity.Server.Controllers
          where TUser : class
          where TUserView : class
     {
+        private readonly ILogger<BaseAuthenticationController<TUser, TKey, TUserView>> logger;
         public IUserService<TUser, TUserView> UserService { get; set; }
         public SignInManager<TUser> SignInManager { get; set; }
         public IUserEmailService<TUser> EmailService { get; set; }
 
-        protected BaseAuthenticationController(IUserService<TUser, TUserView> userService, SignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
+        protected BaseAuthenticationController(IUserService<TUser, TUserView> userService, SignInManager<TUser> signInManager, IUserEmailService<TUser> emailService, ILogger<BaseAuthenticationController<TUser, TKey, TUserView>> logger)
         {
+            this.logger = logger;
             UserService = userService;
             SignInManager = signInManager;
             EmailService = emailService;
@@ -231,9 +234,21 @@ namespace Folke.Identity.Server.Controllers
                 return View((object)"requires-verification");
             }
 
-            var userName = Regex.Replace(loginInfo.ExternalPrincipal.GetUserName() ?? Guid.NewGuid().ToString(), @"[^\w]", "");
+            string userName;
+            if (loginInfo.ExternalPrincipal.GetUserName() != null)
+            {
+                logger.LogInformation(
+                    $"Proposed external principal user name: {loginInfo.ExternalPrincipal.GetUserName()}");
+                userName = loginInfo.ExternalPrincipal.GetUserName();
+            }
+            else
+            {
+                userName = Guid.NewGuid().ToString("N");
+            }
+            userName = Regex.Replace(userName, @"[^\w]", "");
             while (await UserService.FindByNameAsync(userName) != null)
                 userName += "_";
+            logger.LogInformation($"Creating new user {userName}");
             var email = loginInfo.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
             var user = UserService.CreateNewUser(userName, email, true);
             var creationResult = await UserService.CreateAsync(user);
