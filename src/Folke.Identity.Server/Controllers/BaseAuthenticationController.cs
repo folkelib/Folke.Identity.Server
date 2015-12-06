@@ -245,9 +245,9 @@ namespace Folke.Identity.Server.Controllers
             {
                 userName = Guid.NewGuid().ToString("N");
             }
-            userName = Regex.Replace(userName, @"[^\w]", "");
+            userName = Regex.Replace(userName, @"[^a-zA-Z0-9]", "", RegexOptions.CultureInvariant);
             while (await UserService.FindByNameAsync(userName) != null)
-                userName += "_";
+                userName += Guid.NewGuid().ToString("N")[0];
             logger.LogInformation($"Creating new user {userName}");
             var email = loginInfo.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
             var user = UserService.CreateNewUser(userName, email, true);
