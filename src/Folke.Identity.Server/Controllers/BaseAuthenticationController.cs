@@ -20,15 +20,21 @@ namespace Folke.Identity.Server.Controllers
          where TUserView : class
     {
         private readonly ILogger<BaseAuthenticationController<TUser, TKey, TUserView>> logger;
-        public IUserService<TUser, TUserView> UserService { get; set; }
-        public SignInManager<TUser> SignInManager { get; set; }
-        public IUserEmailService<TUser> EmailService { get; set; }
+        protected IUserService<TUser, TUserView> UserService { get; private set; }
+        protected UserManager<TUser> UserManager { get; private set; }
+        protected SignInManager<TUser> SignInManager { get; private set; }
+        protected IUserEmailService<TUser> EmailService { get; private set; }
 
-        protected BaseAuthenticationController(IUserService<TUser, TUserView> userService, SignInManager<TUser> signInManager, IUserEmailService<TUser> emailService, ILogger<BaseAuthenticationController<TUser, TKey, TUserView>> logger)
+        protected BaseAuthenticationController(IUserService<TUser, TUserView> userService,
+            UserManager<TUser> userManager,
+            SignInManager<TUser> signInManager, 
+            IUserEmailService<TUser> emailService, 
+            ILogger<BaseAuthenticationController<TUser, TKey, TUserView>> logger)
         {
             this.logger = logger;
             UserService = userService;
             SignInManager = signInManager;
+            UserManager = userManager;
             EmailService = emailService;
         }
 
@@ -92,7 +98,7 @@ namespace Folke.Identity.Server.Controllers
 
             var user = UserService.CreateNewUser(registerView.Email, registerView.Email, false);
             
-            var result = await UserService.CreateAsync(user, registerView.Password);
+            var result = await UserManager.CreateAsync(user, registerView.Password);
             if (!result.Succeeded)
             {
                 AddErrors(result);
@@ -100,8 +106,9 @@ namespace Folke.Identity.Server.Controllers
             }
             await SignInManager.SignInAsync(user, isPersistent: false);
 
-            await EmailService.SendEmailConfirmationEmail(user);
-            return Created("GetAccount", Convert.ChangeType(await UserService.GetUserIdAsync(user), typeof(TKey)), UserService.MapToUserView(user));
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+            await EmailService.SendEmailConfirmationEmail(user, code);
+            return Created("GetAccount", Convert.ChangeType(await UserManager.GetUserIdAsync(user), typeof(TKey)), UserService.MapToUserView(user));
         }
 
 
@@ -109,13 +116,14 @@ namespace Folke.Identity.Server.Controllers
         public async Task<IActionResult> SendAccountConfirm([FromQuery]int userId)
         {
             var user = await GetCurrentUserAsync();
-            await EmailService.SendEmailConfirmationEmail(user);
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+            await EmailService.SendEmailConfirmationEmail(user, code);
             return Ok();
         }
 
         private Task<TUser> GetCurrentUserAsync()
         {
-            return UserService.FindByIdAsync(HttpContext.User.GetUserId());
+            return UserManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
 
         [HttpPut("confirm-email")]
@@ -127,7 +135,7 @@ namespace Folke.Identity.Server.Controllers
             }
 
             var user = await GetCurrentUserAsync();
-            var result = await UserService.ConfirmEmailAsync(user, code);
+            var result = await UserManager.ConfirmEmailAsync(user, code);
             if (!result.Succeeded)
             {
                 AddErrors(result);
@@ -144,13 +152,14 @@ namespace Folke.Identity.Server.Controllers
                 return HttpBadRequest(ModelState);
             }
 
-            var user = await UserService.FindByEmailAsync(forgotPasswordView.Email);
-            if (user == null || !(await UserService.IsEmailConfirmedAsync(user)))
+            var user = await UserManager.FindByEmailAsync(forgotPasswordView.Email);
+            if (user == null || !(await UserManager.IsEmailConfirmedAsync(user)))
             {
                 return HttpBadRequest();
             }
 
-            await EmailService.SendPasswordResetEmail(user);
+            string code = await UserManager.GeneratePasswordResetTokenAsync(user);
+            await EmailService.SendPasswordResetEmail(user, code);
             return Ok();
         }
 
@@ -165,16 +174,16 @@ namespace Folke.Identity.Server.Controllers
             TUser user;
             if (!string.IsNullOrEmpty(resetPasswordView.Email))
             {
-                user = await UserService.FindByEmailAsync(resetPasswordView.Email);
+                user = await UserManager.FindByEmailAsync(resetPasswordView.Email);
 
             }
             else
             {
-                user = await UserService.FindByIdAsync(resetPasswordView.UserId);
+                user = await UserManager.FindByIdAsync(resetPasswordView.UserId);
             }
 
             var result =
-                await UserService.ResetPasswordAsync(user, resetPasswordView.Code, resetPasswordView.Password);
+                await UserManager.ResetPasswordAsync(user, resetPasswordView.Code, resetPasswordView.Password);
             if (!result.Succeeded)
             {
                 AddErrors(result);
@@ -207,7 +216,7 @@ namespace Folke.Identity.Server.Controllers
             {
                 return BadRequest<SendCodeView>("No user");
             }
-            var userFactors = await UserService.GetValidTwoFactorProvidersAsync(user);
+            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(user);
             return Ok(new SendCodeView { RememberMe = rememberMe, Providers = userFactors });
         }
         
@@ -246,15 +255,15 @@ namespace Folke.Identity.Server.Controllers
                 userName = Guid.NewGuid().ToString("N");
             }
             userName = Regex.Replace(userName, @"[^a-zA-Z0-9]", "", RegexOptions.CultureInvariant);
-            while (await UserService.FindByNameAsync(userName) != null)
+            while (await UserManager.FindByNameAsync(userName) != null)
                 userName += Guid.NewGuid().ToString("N")[0];
             logger.LogInformation($"Creating new user {userName}");
             var email = loginInfo.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
             var user = UserService.CreateNewUser(userName, email, true);
-            var creationResult = await UserService.CreateAsync(user);
+            var creationResult = await UserManager.CreateAsync(user);
             if (creationResult.Succeeded)
             {
-                creationResult = await UserService.AddLoginAsync(user, loginInfo);
+                creationResult = await UserManager.AddLoginAsync(user, loginInfo);
                 if (creationResult.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false);

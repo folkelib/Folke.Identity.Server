@@ -14,15 +14,17 @@ namespace Folke.Identity.Server.Controllers
         where TUserView : class
         where TUser : class
     {
-        protected IUserService<TUser, TUserView> UserService { get; set; }
-        protected IUserSignInManager<TUser> SignInManager { get; set; }
+        protected IUserService<TUser, TUserView> UserService { get; private set; }
+        protected SignInManager<TUser> SignInManager { get; private set; }
         protected IUserEmailService<TUser> EmailService { get; set; }
+        protected UserManager<TUser> UserManager { get; private set; }
 
-        public BaseUserController(IUserService<TUser, TUserView> userService, IUserSignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
+        public BaseUserController(IUserService<TUser, TUserView> userService, UserManager<TUser> userManager, SignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
         {
             UserService = userService;
             SignInManager = signInManager;
             EmailService = emailService;
+            UserManager = userManager;
         }
         
         [HttpPut("password")]
@@ -32,9 +34,9 @@ namespace Folke.Identity.Server.Controllers
             {
                 return HttpBadRequest(ModelState);
             }
-            var account = await GetCurrentUserAsync();
+            var account = await UserService.GetCurrentUserAsync();
             var result =
-                await UserService.ChangePasswordAsync(account, view.OldPassword, view.NewPassword);
+                await UserManager.ChangePasswordAsync(account, view.OldPassword, view.NewPassword);
             if (result.Succeeded)
             {
                 await SignInManager.SignInAsync(account, isPersistent: false);
@@ -49,8 +51,8 @@ namespace Folke.Identity.Server.Controllers
         {
             if (ModelState.IsValid)
             {
-                var account = await GetCurrentUserAsync();
-                var result = await UserService.AddPasswordAsync(account, model.NewPassword);
+                var account = await UserService.GetCurrentUserAsync();
+                var result = await UserManager.AddPasswordAsync(account, model.NewPassword);
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(account, isPersistent: false);
@@ -66,11 +68,12 @@ namespace Folke.Identity.Server.Controllers
         {
             if (ModelState.IsValid)
             {
-                var account = await GetCurrentUserAsync();
-                var result = await UserService.SetEmailAsync(account, model.Email);
+                var account = await UserService.GetCurrentUserAsync();
+                var result = await UserManager.SetEmailAsync(account, model.Email);
                 if (result.Succeeded)
                 {
-                    await EmailService.SendEmailConfirmationEmail(account);
+                    var code = await UserManager.GenerateEmailConfirmationTokenAsync(account);
+                    await EmailService.SendEmailConfirmationEmail(account, code);
                     return Ok();
                 }
                 AddErrors(result);
@@ -81,14 +84,17 @@ namespace Folke.Identity.Server.Controllers
         [HttpGet("me")]
         public async Task<IHttpActionResult<TUserView>> GetMe()
         {
-            return Ok(UserService.MapToUserView(await GetCurrentUserAsync()));
+            return Ok(UserService.MapToUserView(await UserService.GetCurrentUserAsync()));
         }
 
-        [NonAction]
-        protected async Task<TUser> GetCurrentUserAsync()
+        [HttpGet("{id}", Name = "GetAccount")]
+        public virtual async Task<IHttpActionResult<TUserView>> Get(TKey id)
         {
-            if (!HttpContext.User.Identity.IsAuthenticated) return null;
-            return await UserService.FindByIdAsync(HttpContext.User.GetUserId());
+            var userId = id.ToString();
+            var user = await UserManager.FindByIdAsync(userId);
+            if (!HttpContext.User.Identity.IsAuthenticated) return Unauthorized<TUserView>();
+            if (HttpContext.User.GetUserId() != userId) return Unauthorized<TUserView>();
+            return Ok(UserService.MapToUserView(user));
         }
 
         private void AddErrors(IdentityResult result)
