@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Folke.Identity.Server.Views;
 
 namespace Folke.Identity.Server.Services
 {
@@ -22,5 +24,13 @@ namespace Folke.Identity.Server.Services
         /// <summary>Gets the current user</summary>
         /// <returns>The current user</returns>
         Task<TUser> GetCurrentUserAsync();
+
+        /// <summary>Search users by name</summary>
+        /// <param name="name">The user name (can be empty)</param>
+        /// <param name="offset">The number of users to skip</param>
+        /// <param name="limit">The maximum number of users to return</param>
+        /// <param name="sortColumn">The column used to sort the result</param>
+        /// <returns></returns>
+        Task<IList<TUser>> Search(UserSearchFilter name, int offset, int limit, string sortColumn);
     }
 }

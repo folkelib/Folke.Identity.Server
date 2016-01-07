@@ -1,6 +1,5 @@
 ﻿using System;
 using Folke.Identity.Server.Services;
-using Microsoft.AspNet.Identity;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -15,6 +14,16 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddScoped<IUserService<TUser, TUserView>, TUserService>();
             services.AddScoped<IUserEmailService<TUser>, TUserEmailService>();
+            return services;
+        }
+
+        public static IServiceCollection AddRoleIdentityServer<TRole, TRoleService, TRoleView>(
+            this IServiceCollection services)
+            where TRole : class
+            where TRoleView : class
+            where TRoleService: class, IRoleService<TRole, TRoleView>
+        {
+            services.AddScoped<IRoleService<TRole, TRoleView>, TRoleService>();
             return services;
         }
     }

@@ -1,8 +1,8 @@
 ﻿namespace Folke.Identity.Server.Services
 {
-    public interface IRoleService<TRole, TRoleView> where TRole : class
+    public interface IRoleService<TRole, out TRoleView> where TRole : class
     {
-        TRoleView MapToRoleView(TRole user);
-        TRole CreateNewRole(TRoleView view);
+        TRoleView MapToRoleView(TRole role);
+        TRole CreateNewRole(string name);
     }
 }

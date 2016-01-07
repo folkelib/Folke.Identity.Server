@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Folke.Identity.Server.Services;
@@ -6,6 +7,8 @@ using Folke.Identity.Server.Views;
 using Folke.Mvc.Extensions;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
+using System.Linq;
+using Microsoft.AspNet.Authorization;
 
 namespace Folke.Identity.Server.Controllers
 {
@@ -14,10 +17,10 @@ namespace Folke.Identity.Server.Controllers
         where TUserView : class
         where TUser : class
     {
-        protected IUserService<TUser, TUserView> UserService { get; private set; }
-        protected SignInManager<TUser> SignInManager { get; private set; }
+        protected IUserService<TUser, TUserView> UserService { get; }
+        protected SignInManager<TUser> SignInManager { get; }
         protected IUserEmailService<TUser> EmailService { get; set; }
-        protected UserManager<TUser> UserManager { get; private set; }
+        protected UserManager<TUser> UserManager { get; }
 
         public BaseUserController(IUserService<TUser, TUserView> userService, UserManager<TUser> userManager, SignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
         {
@@ -95,6 +98,14 @@ namespace Folke.Identity.Server.Controllers
             if (!HttpContext.User.Identity.IsAuthenticated) return Unauthorized<TUserView>();
             if (HttpContext.User.GetUserId() != userId) return Unauthorized<TUserView>();
             return Ok(UserService.MapToUserView(user));
+        }
+
+        [HttpPut("search")]
+        [Authorize("UserList")]
+        public async Task<IHttpActionResult<IEnumerable<TUserView>>> Search([FromBody] UserSearchFilter filter,
+            [FromQuery]int offset, [FromQuery]int limit, [FromQuery]string sortColumn)
+        {
+            return Ok((await UserService.Search(filter, offset, limit, sortColumn)).Select(x => UserService.MapToUserView(x)));
         }
 
         private void AddErrors(IdentityResult result)
