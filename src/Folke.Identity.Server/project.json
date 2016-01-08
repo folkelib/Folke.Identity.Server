@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.1.0-beta-*",
+  "version": "1.1.0-*",
   "description": "MVC 6 base controllers that expose ASP.NET Identity Web API for a Single Page Application",
   "authors": [ "Sidoine" ],
   "tags": [ "" ],
