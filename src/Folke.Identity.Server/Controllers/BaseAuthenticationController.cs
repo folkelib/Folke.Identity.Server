@@ -20,10 +20,10 @@ namespace Folke.Identity.Server.Controllers
          where TUserView : class
     {
         private readonly ILogger<BaseAuthenticationController<TUser, TKey, TUserView>> logger;
-        protected IUserService<TUser, TUserView> UserService { get; private set; }
-        protected UserManager<TUser> UserManager { get; private set; }
-        protected SignInManager<TUser> SignInManager { get; private set; }
-        protected IUserEmailService<TUser> EmailService { get; private set; }
+        protected IUserService<TUser, TUserView> UserService { get; }
+        protected UserManager<TUser> UserManager { get; }
+        protected SignInManager<TUser> SignInManager { get; }
+        protected IUserEmailService<TUser> EmailService { get; }
 
         protected BaseAuthenticationController(IUserService<TUser, TUserView> userService,
             UserManager<TUser> userManager,

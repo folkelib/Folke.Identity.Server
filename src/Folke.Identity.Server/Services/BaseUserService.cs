@@ -7,6 +7,11 @@ using Folke.Identity.Server.Views;
 
 namespace Folke.Identity.Server.Services
 {
+    /// <summary>
+    /// A base implementation of IUserService
+    /// </summary>
+    /// <typeparam name="TUser">The user type</typeparam>
+    /// <typeparam name="TUserView">The user view type</typeparam>
     public abstract class BaseUserService<TUser, TUserView> : IUserService<TUser, TUserView>
         where TUser : class
         where TUserView : class
