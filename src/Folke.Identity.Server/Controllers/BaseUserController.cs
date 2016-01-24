@@ -108,6 +108,13 @@ namespace Folke.Identity.Server.Controllers
             return Ok((await UserService.Search(filter, offset, limit, sortColumn)).Select(x => UserService.MapToUserView(x)));
         }
 
+        [HttpGet("~/api/user/me/role")]
+        public async Task<IHttpActionResult<IList<string>>> GetUserRoles()
+        {
+            var roles = await UserManager.GetRolesAsync(await UserService.GetCurrentUserAsync());
+            return Ok(roles);
+        }
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)

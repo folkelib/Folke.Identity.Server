@@ -153,7 +153,7 @@ namespace Folke.Identity.Server.Controllers
             }
 
             var user = await UserManager.FindByEmailAsync(forgotPasswordView.Email);
-            if (user == null || !(await UserManager.IsEmailConfirmedAsync(user)))
+            if (user == null)
             {
                 return HttpBadRequest();
             }

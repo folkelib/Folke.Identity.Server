@@ -10,7 +10,6 @@ using Microsoft.AspNet.Authorization;
 
 namespace Folke.Identity.Server.Controllers
 {
-    [Authorize("Role")]
     public class BaseRoleController<TRole, TRoleView, TKey, TUser> : TypedControllerBase
         where TRole : class
         where TUser : class
@@ -26,18 +25,21 @@ namespace Folke.Identity.Server.Controllers
             this.userManager = userManager;
         }
 
+        [Authorize("Role")]
         [HttpGet("{id}", Name = "GetRole")]
         public async Task<IHttpActionResult<TRoleView>> Get(string id)
         {
             return Ok(roleService.MapToRoleView(await roleManager.FindByIdAsync(id)));
         }
 
+        [Authorize("Role")]
         [HttpGet]
         public IHttpActionResult<IEnumerable<TRoleView>> GetAll()
         {
             return Ok(roleManager.Roles.ToList().Select(x => roleService.MapToRoleView(x)));
         }
 
+        [Authorize("Role")]
         [HttpPost]
         public async Task<IHttpActionResult<TRoleView>> Create([FromBody]string name)
         {
@@ -51,6 +53,7 @@ namespace Folke.Identity.Server.Controllers
             return Created("GetRole", Convert.ChangeType(await roleManager.GetRoleIdAsync(role), typeof(TKey)), roleService.MapToRoleView(role));
         }
 
+        [Authorize("Role")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -58,7 +61,8 @@ namespace Folke.Identity.Server.Controllers
             await roleManager.DeleteAsync(role);
             return Ok();
         }
-
+        
+        [Authorize("Role")]
         [HttpPost("~/api/user/{userId}/role")]
         public async Task<IActionResult> AddUser([FromBody]string roleName,string userId)
         {
@@ -67,6 +71,7 @@ namespace Folke.Identity.Server.Controllers
             return Ok();
         }
 
+        [Authorize("Role")]
         [HttpDelete("~/api/user/{userId}/role")]
         public async Task<IActionResult> DeleteUser([FromBody]string roleName, string userId)
         {
@@ -75,6 +80,7 @@ namespace Folke.Identity.Server.Controllers
             return Ok();
         }
 
+        [Authorize("Role")]
         [HttpGet("~/api/user/{userId}/role")]
         public async Task<IHttpActionResult<IList<string>>> GetForUser(string userId)
         {
