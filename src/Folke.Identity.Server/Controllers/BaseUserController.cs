@@ -111,7 +111,8 @@ namespace Folke.Identity.Server.Controllers
         [HttpGet("~/api/user/me/role")]
         public async Task<IHttpActionResult<IList<string>>> GetUserRoles()
         {
-            var roles = await UserManager.GetRolesAsync(await UserService.GetCurrentUserAsync());
+            var currentUser = await UserService.GetCurrentUserAsync();
+            IList<string> roles = currentUser == null ? new List<string>() : await UserManager.GetRolesAsync(currentUser);
             return Ok(roles);
         }
 
