@@ -14,22 +14,23 @@ using Microsoft.Extensions.Logging;
 
 namespace Folke.Identity.Server.Controllers
 {
-    public abstract class BaseAuthenticationController<TUser, TKey, TUserView> : TypedControllerBase
+    [Route("api/authentication")]
+    public class AuthenticationController<TUser, TKey, TUserView> : TypedControllerBase
          where TKey : IEquatable<TKey>
          where TUser : class
          where TUserView : class
     {
-        private readonly ILogger<BaseAuthenticationController<TUser, TKey, TUserView>> logger;
+        private readonly ILogger<AuthenticationController<TUser, TKey, TUserView>> logger;
         protected IUserService<TUser, TUserView> UserService { get; }
         protected UserManager<TUser> UserManager { get; }
         protected SignInManager<TUser> SignInManager { get; }
         protected IUserEmailService<TUser> EmailService { get; }
 
-        protected BaseAuthenticationController(IUserService<TUser, TUserView> userService,
+        protected AuthenticationController(IUserService<TUser, TUserView> userService,
             UserManager<TUser> userManager,
             SignInManager<TUser> signInManager, 
             IUserEmailService<TUser> emailService, 
-            ILogger<BaseAuthenticationController<TUser, TKey, TUserView>> logger)
+            ILogger<AuthenticationController<TUser, TKey, TUserView>> logger)
         {
             this.logger = logger;
             UserService = userService;

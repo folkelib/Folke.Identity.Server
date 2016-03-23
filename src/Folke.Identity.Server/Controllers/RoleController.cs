@@ -10,7 +10,8 @@ using Microsoft.AspNet.Authorization;
 
 namespace Folke.Identity.Server.Controllers
 {
-    public class BaseRoleController<TRole, TRoleView, TKey, TUser> : TypedControllerBase
+    [Route("api/role")]
+    public class RoleController<TRole, TRoleView, TKey, TUser> : TypedControllerBase
         where TRole : class
         where TUser : class
     {
@@ -18,7 +19,7 @@ namespace Folke.Identity.Server.Controllers
         private readonly RoleManager<TRole> roleManager;
         private readonly UserManager<TUser> userManager;
 
-        public BaseRoleController(IRoleService<TRole, TRoleView> roleService, RoleManager<TRole> roleManager, UserManager<TUser> userManager)
+        public RoleController(IRoleService<TRole, TRoleView> roleService, RoleManager<TRole> roleManager, UserManager<TUser> userManager)
         {
             this.roleService = roleService;
             this.roleManager = roleManager;

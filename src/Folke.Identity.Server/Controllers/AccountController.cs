@@ -12,7 +12,8 @@ using Microsoft.AspNet.Authorization;
 
 namespace Folke.Identity.Server.Controllers
 {
-    public class BaseUserController<TUser, TUserView, TKey> : TypedControllerBase
+    [Route("api/account")]
+    public class AccountController<TUser, TUserView, TKey> : TypedControllerBase
         where TKey : IEquatable<TKey>
         where TUserView : class
         where TUser : class
@@ -22,7 +23,7 @@ namespace Folke.Identity.Server.Controllers
         protected IUserEmailService<TUser> EmailService { get; set; }
         protected UserManager<TUser> UserManager { get; }
 
-        public BaseUserController(IUserService<TUser, TUserView> userService, UserManager<TUser> userManager, SignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
+        public AccountController(IUserService<TUser, TUserView> userService, UserManager<TUser> userManager, SignInManager<TUser> signInManager, IUserEmailService<TUser> emailService)
         {
             UserService = userService;
             SignInManager = signInManager;

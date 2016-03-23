@@ -25,6 +25,8 @@ namespace Folke.Identity.Server.Services
             this.userManager = userManager;
         }
 
+        protected UserManager<TUser> UserManager => userManager;
+
         public abstract TUser CreateNewUser(string userName, string email, bool emailConfirmed);
 
         public async Task<TUser> GetCurrentUserAsync()
