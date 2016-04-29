@@ -26,7 +26,7 @@ namespace Folke.Identity.Server.Controllers
         protected SignInManager<TUser> SignInManager { get; }
         protected IUserEmailService<TUser> EmailService { get; }
 
-        protected AuthenticationController(IUserService<TUser, TUserView> userService,
+        public AuthenticationController(IUserService<TUser, TUserView> userService,
             UserManager<TUser> userManager,
             SignInManager<TUser> signInManager, 
             IUserEmailService<TUser> emailService, 
@@ -260,6 +260,11 @@ namespace Folke.Identity.Server.Controllers
                 userName += Guid.NewGuid().ToString("N")[0];
             logger.LogInformation($"Creating new user {userName}");
             var email = loginInfo.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
+            if (await UserManager.FindByEmailAsync(email) != null)
+            {
+                return HttpBadRequest($"Already registered with {email}");
+            }
+
             var user = UserService.CreateNewUser(userName, email, true);
             var creationResult = await UserManager.CreateAsync(user);
             if (creationResult.Succeeded)
