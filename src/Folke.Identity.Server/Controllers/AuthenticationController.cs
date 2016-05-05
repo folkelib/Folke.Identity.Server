@@ -8,6 +8,7 @@ using Folke.Identity.Server.Enumeration;
 using Folke.Identity.Server.Services;
 using Folke.Identity.Server.Views;
 using Folke.Mvc.Extensions;
+using Microsoft.AspNet.Http.Authentication;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
@@ -65,7 +66,7 @@ namespace Folke.Identity.Server.Controllers
             {
                 return Ok(new LoginResultView { Status = LoginStatusEnum.RequiresVerification });
             }
-
+            
             // TODO localization
             return BadRequest<LoginResultView>("Mot-de-passe ou e-mail non valide");
         }
@@ -193,6 +194,32 @@ namespace Folke.Identity.Server.Controllers
             return Ok();
         }
 
+        [HttpGet("link-external-login")]
+        public IActionResult LinkLogin([FromQuery]string provider)
+        {
+            // Request a redirect to the external login provider to link a login for the current user
+            var redirectUrl = Request.Scheme + "://" + Request.Host + "/api/authentication/link-callback";
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, User.GetUserId());
+            return new ChallengeResult(provider, properties);
+        }
+        
+        [HttpGet("link-callback")]
+        public async Task<ActionResult> LinkLoginCallback()
+        {
+            var user = await GetCurrentUserAsync();
+            if (user == null)
+            {
+                return View("ExternalLoginCallback", "failure");
+            }
+            var info = await SignInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return View("ExternalLoginCallback", "failure");
+            }
+            var result = await UserManager.AddLoginAsync(user, info);
+            return View("ExternalLoginCallback", result.Succeeded ? "success" : "failure"); ;
+        }
+
         [HttpGet("external-login")]
         public IActionResult ExternalLogin([FromQuery] string provider, [FromQuery] string returnUrl)
         {
@@ -201,33 +228,13 @@ namespace Folke.Identity.Server.Controllers
             return new ChallengeResult(provider, properties);
         }
 
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error.Description);
-            }
-        }
-
-        [HttpGet("send-code")]
-        public async Task<IHttpActionResult<SendCodeView>> GetSendCode([FromQuery] bool rememberMe)
-        {
-            var user = await SignInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
-            {
-                return BadRequest<SendCodeView>("No user");
-            }
-            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(user);
-            return Ok(new SendCodeView { RememberMe = rememberMe, Providers = userFactors });
-        }
-        
         [HttpGet("callback")]
         public async Task<ActionResult> ExternalLoginCallback([FromQuery]string returnUrl)
         {
             var loginInfo = await SignInManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
-                return HttpBadRequest("No login info");
+                return View((object)"failure");
             }
 
             var result = await SignInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, isPersistent: false);
@@ -262,7 +269,7 @@ namespace Folke.Identity.Server.Controllers
             var email = loginInfo.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
             if (await UserManager.FindByEmailAsync(email) != null)
             {
-                return HttpBadRequest($"Already registered with {email}");
+                return View((object) "password");
             }
 
             var user = UserService.CreateNewUser(userName, email, true);
@@ -279,16 +286,42 @@ namespace Folke.Identity.Server.Controllers
             return View((object)"failure");
         }
 
+        [HttpGet("send-code")]
+        public async Task<IHttpActionResult<SendCodeView>> GetSendCode([FromQuery] bool rememberMe)
+        {
+            var user = await SignInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                return BadRequest<SendCodeView>("No user");
+            }
+            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(user);
+            return Ok(new SendCodeView { RememberMe = rememberMe, Providers = userFactors });
+        }
+
         [HttpDelete("")]
         public async Task LogOff()
         {
             await SignInManager.SignOutAsync();
         }
 
-        [HttpGet("external-login-provider")]
-        public IEnumerable<string> GetExternalAuthenticationProviders()
+        [HttpGet("external-login-providers")]
+        public IEnumerable<AuthenticationDescription> GetExternalAuthenticationProviders()
         {
-            return SignInManager.GetExternalAuthenticationSchemes().Select(x => x.AuthenticationScheme);
+            return SignInManager.GetExternalAuthenticationSchemes();
+        }
+
+        [HttpGet("external-logins")]
+        public async Task<IEnumerable<UserLoginInfo>> GetExternalLogins()
+        {
+            return await UserManager.GetLoginsAsync(await GetCurrentUserAsync());
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
         }
     }
 }
