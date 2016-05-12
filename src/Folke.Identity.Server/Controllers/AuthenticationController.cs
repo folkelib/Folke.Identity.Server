@@ -267,7 +267,7 @@ namespace Folke.Identity.Server.Controllers
                 userName += Guid.NewGuid().ToString("N")[0];
             logger.LogInformation($"Creating new user {userName}");
             var email = loginInfo.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
-            if (await UserManager.FindByEmailAsync(email) != null)
+            if (email != null && await UserManager.FindByEmailAsync(email) != null)
             {
                 return View((object) "password");
             }
