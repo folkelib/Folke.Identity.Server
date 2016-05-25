@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
@@ -8,9 +7,9 @@ using Folke.Identity.Server.Enumeration;
 using Folke.Identity.Server.Services;
 using Folke.Identity.Server.Views;
 using Folke.Mvc.Extensions;
-using Microsoft.AspNet.Http.Authentication;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Folke.Identity.Server.Controllers
@@ -76,7 +75,7 @@ namespace Folke.Identity.Server.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return HttpBadRequest(ModelState);
+                return BadRequest(ModelState);
             }
 
             var result =
@@ -87,7 +86,7 @@ namespace Folke.Identity.Server.Controllers
             {
                 return Ok();
             }
-            return HttpUnauthorized();
+            return Unauthorized();
         }
 
         [HttpPost("register")]
@@ -125,7 +124,7 @@ namespace Folke.Identity.Server.Controllers
 
         private Task<TUser> GetCurrentUserAsync()
         {
-            return UserManager.FindByIdAsync(HttpContext.User.GetUserId());
+            return UserManager.FindByIdAsync(UserManager.GetUserId(HttpContext.User));
         }
 
         [HttpPut("confirm-email")]
@@ -133,7 +132,7 @@ namespace Folke.Identity.Server.Controllers
         {
             if (code == null)
             {
-                return HttpBadRequest();
+                return BadRequest();
             }
 
             var user = await GetCurrentUserAsync();
@@ -141,7 +140,7 @@ namespace Folke.Identity.Server.Controllers
             if (!result.Succeeded)
             {
                 AddErrors(result);
-                return HttpBadRequest(ModelState);
+                return BadRequest(ModelState);
             }
             return Ok();
         }
@@ -151,13 +150,13 @@ namespace Folke.Identity.Server.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return HttpBadRequest(ModelState);
+                return BadRequest(ModelState);
             }
 
             var user = await UserManager.FindByEmailAsync(forgotPasswordView.Email);
             if (user == null)
             {
-                return HttpBadRequest();
+                return BadRequest();
             }
 
             string code = await UserManager.GeneratePasswordResetTokenAsync(user);
@@ -170,7 +169,7 @@ namespace Folke.Identity.Server.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return HttpBadRequest(ModelState);
+                return BadRequest(ModelState);
             }
 
             TUser user;
@@ -189,7 +188,7 @@ namespace Folke.Identity.Server.Controllers
             if (!result.Succeeded)
             {
                 AddErrors(result);
-                return HttpBadRequest(ModelState);
+                return BadRequest(ModelState);
             }
             return Ok();
         }
@@ -199,7 +198,7 @@ namespace Folke.Identity.Server.Controllers
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Request.Scheme + "://" + Request.Host + "/api/authentication/link-callback";
-            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, User.GetUserId());
+            var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));
             return new ChallengeResult(provider, properties);
         }
         
@@ -217,7 +216,7 @@ namespace Folke.Identity.Server.Controllers
                 return View("ExternalLoginCallback", "failure");
             }
             var result = await UserManager.AddLoginAsync(user, info);
-            return View("ExternalLoginCallback", result.Succeeded ? "success" : "failure"); ;
+            return View("ExternalLoginCallback", result.Succeeded ? "success" : "failure");
         }
 
         [HttpGet("external-login")]
@@ -252,11 +251,11 @@ namespace Folke.Identity.Server.Controllers
             }
 
             string userName;
-            if (loginInfo.ExternalPrincipal.GetUserName() != null)
+            if (loginInfo.Principal.Identity.Name != null)
             {
                 logger.LogInformation(
-                    $"Proposed external principal user name: {loginInfo.ExternalPrincipal.GetUserName()}");
-                userName = loginInfo.ExternalPrincipal.GetUserName();
+                    $"Proposed external principal user name: {loginInfo.Principal.Identity.Name}");
+                userName = loginInfo.Principal.Identity.Name;
             }
             else
             {
@@ -266,7 +265,7 @@ namespace Folke.Identity.Server.Controllers
             while (await UserManager.FindByNameAsync(userName) != null)
                 userName += Guid.NewGuid().ToString("N")[0];
             logger.LogInformation($"Creating new user {userName}");
-            var email = loginInfo.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
+            var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
             if (email != null && await UserManager.FindByEmailAsync(email) != null)
             {
                 return View((object) "password");

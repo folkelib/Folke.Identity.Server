@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{59FD27E1-6EE9-415F-85A3-04FB569DEDA6}"
 EndProject
@@ -17,6 +17,8 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Folke.Identity.Server", "src\Folke.Identity.Server\Folke.Identity.Server.xproj", "{97AB5561-D32B-4A19-87C2-B50E6509BA61}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Folke.Mvc.Extensions", "..\Folke.Mvc.Extensions\src\Folke.Mvc.Extensions\Folke.Mvc.Extensions.xproj", "{FEFBB264-4B6B-40FB-9870-ED3701890973}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "external", "external", "{2039BD63-DE60-456C-B210-A3D168A31DA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,5 +40,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{97AB5561-D32B-4A19-87C2-B50E6509BA61} = {59FD27E1-6EE9-415F-85A3-04FB569DEDA6}
+		{FEFBB264-4B6B-40FB-9870-ED3701890973} = {2039BD63-DE60-456C-B210-A3D168A31DA7}
 	EndGlobalSection
 EndGlobal

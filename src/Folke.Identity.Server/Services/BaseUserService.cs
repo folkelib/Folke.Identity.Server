@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Identity;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Folke.Identity.Server.Views;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace Folke.Identity.Server.Services
 {
@@ -32,7 +31,7 @@ namespace Folke.Identity.Server.Services
         public async Task<TUser> GetCurrentUserAsync()
         {
             if (!httpContextAccessor.HttpContext.User.Identity.IsAuthenticated) return null;
-            return await userManager.FindByIdAsync(httpContextAccessor.HttpContext.User.GetUserId());
+            return await userManager.FindByIdAsync(UserManager.GetUserId(httpContextAccessor.HttpContext.User));
         }
 
         public abstract Task<IList<TUser>> Search(UserSearchFilter name, int offset, int limit, string sortColumn);

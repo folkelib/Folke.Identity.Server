@@ -3,3 +3,5 @@
 *.user
 *.v2.ncrunchsolution
 artifacts
+bin
+obj

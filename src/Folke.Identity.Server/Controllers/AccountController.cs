@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Folke.Identity.Server.Services;
 using Folke.Identity.Server.Views;
 using Folke.Mvc.Extensions;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using Microsoft.AspNet.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Folke.Identity.Server.Controllers
 {
@@ -36,7 +35,7 @@ namespace Folke.Identity.Server.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return HttpBadRequest(ModelState);
+                return BadRequest(ModelState);
             }
             var account = await UserService.GetCurrentUserAsync();
             var result =
@@ -47,7 +46,7 @@ namespace Folke.Identity.Server.Controllers
                 return Ok();
             }
             AddErrors(result);
-            return HttpBadRequest(ModelState);
+            return BadRequest(ModelState);
         }
 
         [HttpPost("password")]
@@ -64,7 +63,7 @@ namespace Folke.Identity.Server.Controllers
                 }
                 AddErrors(result);
             }
-            return HttpBadRequest(ModelState);
+            return BadRequest(ModelState);
         }
 
         [HttpPut("email")]
@@ -82,7 +81,7 @@ namespace Folke.Identity.Server.Controllers
                 }
                 AddErrors(result);
             }
-            return HttpBadRequest(ModelState);
+            return BadRequest(ModelState);
         }
 
         [HttpGet("me")]
@@ -97,7 +96,7 @@ namespace Folke.Identity.Server.Controllers
             var userId = id.ToString();
             var user = await UserManager.FindByIdAsync(userId);
             if (!HttpContext.User.Identity.IsAuthenticated) return Unauthorized<TUserView>();
-            if (HttpContext.User.GetUserId() != userId) return Unauthorized<TUserView>();
+            if (UserManager.GetUserId(HttpContext.User) != userId) return Unauthorized<TUserView>();
             return Ok(UserService.MapToUserView(user));
         }
 
