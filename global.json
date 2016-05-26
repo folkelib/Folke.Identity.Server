@@ -1,5 +1,5 @@
 {
-  "projects": [ "src", "test", "../Folke.Mvc.Extensions/src", "../Folke.Identity.Elm/src" ],
+  "projects": [ "src", "test", "../Folke.Mvc.Extensions/src", "../Folke.Identity.Elm/src", "../Identity/src" ],
   "sdk": {
     "version": "1.0.0-preview1-002702"
   }
