@@ -10,6 +10,7 @@
   "dependencies": {
     "Microsoft.AspNetCore.Identity": "1.0.0-rc2-final",
     "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-rc2-final",
+    "Microsoft.AspNetCore.DataProtection": "1.0.0-rc2-final",
     "Folke.Mvc.Extensions": "1.1.0-beta-*"
   },
 

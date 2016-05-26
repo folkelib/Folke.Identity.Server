@@ -20,23 +20,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
         
-        public static IMvcBuilder AddIdentityServerControllers<TKey, TUser, TUserView, TRole, TRoleView>(
-            this IMvcBuilder builder)
-             where TUser : class
-            where TUserView : class
-            where TKey : IEquatable<TKey>
-            where TRole : class
-            where TRoleView : class
-        {
-            var feature = new ControllerFeature();
-            feature.Controllers.Add(typeof (AuthenticationController<TUser, TKey, TUserView>).GetTypeInfo());
-            feature.Controllers.Add(typeof(RoleController<TRole, TRoleView, TKey, TUser>).GetTypeInfo());
-            feature.Controllers.Add(typeof(AccountController<TUser, TUserView, TKey>).GetTypeInfo());
-
-            builder.ConfigureApplicationPartManager(manager => manager.PopulateFeature(feature));
-            return builder;
-        }
-
         public static IServiceCollection AddRoleIdentityServer<TRole, TRoleService, TRoleView>(
             this IServiceCollection services)
             where TRole : class
