@@ -8,10 +8,10 @@
     "licenseUrl": "http://opensource.org/licenses/MIT"
   },
   "dependencies": {
-    "Microsoft.AspNetCore.Identity": "1.0.0-rc2-final",
-    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-rc2-final",
-    "Microsoft.AspNetCore.DataProtection": "1.0.0-rc2-final",
-    "Folke.Mvc.Extensions": "1.1.0-beta-*"
+    "Microsoft.AspNetCore.Identity": "1.0.0",
+    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0",
+    "Microsoft.AspNetCore.DataProtection": "1.0.0",
+    "Folke.Mvc.Extensions": "1.2.0-*"
   },
 
   "frameworks": {
@@ -20,11 +20,11 @@
     "netstandard1.5": {
       "imports": [ "dnxcore50", "portable-net45+win8" ],
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-rc2-24027",
-        "System.Collections": "4.0.11-rc2-24027",
-        "System.Linq": "4.1.0-rc2-24027",
-        "System.Runtime": "4.1.0-rc2-24027",
-        "System.Threading": "4.0.11-rc2-24027"
+        "Microsoft.CSharp": "4.0.1",
+        "System.Collections": "4.0.11",
+        "System.Linq": "4.1.0",
+        "System.Runtime": "4.1.0",
+        "System.Threading": "4.0.11"
       }
     }
   }
