@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{59FD27E1-6EE9-415F-85A3-04FB569DEDA6}"
 EndProject
@@ -20,8 +20,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Folke.Mvc.Extensions", "..\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "external", "external", "{2039BD63-DE60-456C-B210-A3D168A31DA7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Identity", "..\Identity\src\Microsoft.AspNetCore.Identity\Microsoft.AspNetCore.Identity.xproj", "{1729302E-A58E-4652-B639-5B6B68DA2748}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,10 +34,6 @@ Global
 		{FEFBB264-4B6B-40FB-9870-ED3701890973}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEFBB264-4B6B-40FB-9870-ED3701890973}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEFBB264-4B6B-40FB-9870-ED3701890973}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1729302E-A58E-4652-B639-5B6B68DA2748}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1729302E-A58E-4652-B639-5B6B68DA2748}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1729302E-A58E-4652-B639-5B6B68DA2748}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1729302E-A58E-4652-B639-5B6B68DA2748}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,6 +41,5 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{56112C86-D79A-4FE6-B23E-A1924A2B9EBA} = {59FD27E1-6EE9-415F-85A3-04FB569DEDA6}
 		{FEFBB264-4B6B-40FB-9870-ED3701890973} = {2039BD63-DE60-456C-B210-A3D168A31DA7}
-		{1729302E-A58E-4652-B639-5B6B68DA2748} = {2039BD63-DE60-456C-B210-A3D168A31DA7}
 	EndGlobalSection
 EndGlobal
