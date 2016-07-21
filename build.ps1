@@ -12,7 +12,7 @@ if ($version -ne "") {
     & dotnet restore
     cd .\src\Folke.Identity.Server
     & dotnet pack -c Release
-    $file = Get-Item "bin\Release\*-$version.nupkg"
+    $file = Get-Item "bin\Release\*.$version.nupkg"
     nuget push $file.FullName $key -Source https://api.nuget.org/v3/index.json
     cd ..\..
 }
