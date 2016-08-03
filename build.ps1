@@ -1,6 +1,6 @@
 param([String]$key,[String]$version)
 
-function setProjectionVersion([String]$fileName, [String]$version) {
+function setProjectVersion([String]$fileName, [String]$version) {
     $content = (Get-Content $fileName) -join "`n" | ConvertFrom-Json
     $content.version = $version
     $newContent = ConvertTo-Json -Depth 10 $content
@@ -8,7 +8,7 @@ function setProjectionVersion([String]$fileName, [String]$version) {
 }
 
 if ($version -ne "") {
-    setProjectionVersion ".\src\Folke.Identity.Server\project.json" $version
+    setProjectVersion ".\src\Folke.Identity.Server\project.json" $version
     & dotnet restore
     cd .\src\Folke.Identity.Server
     & dotnet pack -c Release
