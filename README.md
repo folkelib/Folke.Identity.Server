@@ -3,6 +3,8 @@
 
 This library adds MVC 6 Web API that allows to authenticate with a Single Page Application using Microsoft.AspNet.Identity.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/u6d3kw7rm97yk62g?svg=true)](https://ci.appveyor.com/project/acastaner/folke-identity-server)
+
 ## Usage
 
 Modify your `ConfigureServices(IServiceCollection services)` method to add: 
