@@ -34,14 +34,14 @@ namespace Folke.Identity.Server.Controllers
         }
 
         [Authorize("Role")]
-        [HttpGet]
+        [HttpGet("")]
         public IHttpActionResult<IEnumerable<TRoleView>> GetAll()
         {
             return Ok(roleManager.Roles.ToList().Select(x => roleService.MapToRoleView(x)));
         }
 
         [Authorize("Role")]
-        [HttpPost]
+        [HttpPost("")]
         public async Task<IHttpActionResult<TRoleView>> Create([FromBody]string name)
         {
             var role = roleService.CreateNewRole(name);
