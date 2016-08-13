@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -216,6 +217,8 @@ namespace Folke.Identity.Server.Controllers
                 return View("ExternalLoginCallback", "failure");
             }
             var result = await UserManager.AddLoginAsync(user, info);
+            if (result.Succeeded)
+                result = await SaveExternalLoginInfoClaims(user, info);
             return View("ExternalLoginCallback", result.Succeeded ? "success" : "failure");
         }
 
@@ -277,6 +280,8 @@ namespace Folke.Identity.Server.Controllers
             {
                 creationResult = await UserManager.AddLoginAsync(user, loginInfo);
                 if (creationResult.Succeeded)
+                    creationResult = await SaveExternalLoginInfoClaims(user, loginInfo);
+                if (creationResult.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false);
                     return View((object)"success");
@@ -321,6 +326,11 @@ namespace Folke.Identity.Server.Controllers
             {
                 ModelState.AddModelError("", error.Description);
             }
+        }
+        
+        private async Task<IdentityResult> SaveExternalLoginInfoClaims(TUser user, ExternalLoginInfo info)
+        {
+            return await UserManager.AddClaimsAsync(user, info.Principal.Claims.Where(x => x.Type != ClaimTypes.Email && x.Type != ClaimTypes.NameIdentifier));
         }
     }
 }
