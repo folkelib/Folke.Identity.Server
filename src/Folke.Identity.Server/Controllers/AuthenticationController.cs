@@ -68,7 +68,8 @@ namespace Folke.Identity.Server.Controllers
             }
             
             // TODO localization
-            return BadRequest<LoginResultView>("Mot-de-passe ou e-mail non valide");
+            ModelState.AddModelError(nameof(LoginView.Password), "Mot-de-passe ou e-mail non valide");
+            return BadRequest<LoginResultView>(ModelState);
         }
 
         [HttpPut("verifycode")]

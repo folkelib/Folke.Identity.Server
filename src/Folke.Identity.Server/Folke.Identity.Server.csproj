@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>MVC Core base controllers that expose ASP.NET Identity Web API for a Single Page Application</Description>
+    <VersionPrefix>1.3.1.9</VersionPrefix>
+    <Authors>Sidoine</Authors>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <AssemblyName>Folke.Identity.Server</AssemblyName>
+    <PackageId>Folke.Identity.Server</PackageId>
+    <PackageProjectUrl>https://github.com/folkelib/Folke.Identity.Server</PackageProjectUrl>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="1.1.1" />
+    <PackageReference Include="Folke.Mvc.Extensions" Version="1.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>
