@@ -26,18 +26,22 @@ namespace Folke.Identity.Server.Controllers
         protected UserManager<TUser> UserManager { get; }
         protected SignInManager<TUser> SignInManager { get; }
         protected IUserEmailService<TUser> EmailService { get; }
+        protected IIdentityServerOptionsService OptionsService { get; }
 
         public AuthenticationController(IUserService<TUser, TUserView> userService,
             UserManager<TUser> userManager,
-            SignInManager<TUser> signInManager, 
-            IUserEmailService<TUser> emailService, 
-            ILogger<AuthenticationController<TUser, TKey, TUserView>> logger)
+            SignInManager<TUser> signInManager,
+            IUserEmailService<TUser> emailService,
+            ILogger<AuthenticationController<TUser, TKey, TUserView>> logger,
+            IIdentityServerOptionsService optionsService)
         {
             this.logger = logger;
             UserService = userService;
             SignInManager = signInManager;
             UserManager = userManager;
             EmailService = emailService;
+            OptionsService = optionsService;
+
         }
 
         [HttpPut("login")]
@@ -66,7 +70,7 @@ namespace Folke.Identity.Server.Controllers
             {
                 return Ok(new LoginResultView { Status = LoginStatusEnum.RequiresVerification });
             }
-            
+
             // TODO localization
             ModelState.AddModelError(nameof(LoginView.Password), "Mot-de-passe ou e-mail non valide");
             return BadRequest<LoginResultView>(ModelState);
@@ -99,8 +103,13 @@ namespace Folke.Identity.Server.Controllers
                 return BadRequest<TUserView>(ModelState);
             }
 
+            if (!OptionsService.IsRegistrationEnabled())
+            {
+                return BadRequest<TUserView>("Registration is disabled");
+            }
+
             var user = UserService.CreateNewUser(registerView.Email, registerView.Email, false);
-            
+
             var result = await UserManager.CreateAsync(user, registerView.Password);
             if (!result.Succeeded)
             {
@@ -203,7 +212,7 @@ namespace Folke.Identity.Server.Controllers
             var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(User));
             return new ChallengeResult(provider, properties);
         }
-        
+
         [HttpGet("link-callback")]
         public async Task<ActionResult> LinkLoginCallback()
         {
@@ -272,7 +281,7 @@ namespace Folke.Identity.Server.Controllers
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
             if (email != null && await UserManager.FindByEmailAsync(email) != null)
             {
-                return View((object) "password");
+                return View((object)"password");
             }
 
             var user = UserService.CreateNewUser(userName, email, true);
@@ -328,7 +337,7 @@ namespace Folke.Identity.Server.Controllers
                 ModelState.AddModelError("", error.Description);
             }
         }
-        
+
         private async Task<IdentityResult> SaveExternalLoginInfoClaims(TUser user, ExternalLoginInfo info)
         {
             return await UserManager.AddClaimsAsync(user, info.Principal.Claims.Where(x => x.Type != ClaimTypes.Email && x.Type != ClaimTypes.NameIdentifier));
