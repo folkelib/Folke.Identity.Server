@@ -1,20 +1,23 @@
 ﻿using System;
-using System.Reflection;
-using Folke.Identity.Server.Controllers;
+using Folke.Identity.Server;
 using Folke.Identity.Server.Services;
-using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IdentityServerServiceCollectionExtensions
     {
-        public static IServiceCollection AddIdentityServer<TUser, TKey, TUserEmailService, TUserService, TUserView>(this IServiceCollection services)
+        public static IServiceCollection AddIdentityServer<TUser, TKey, TUserEmailService, TUserService, TUserView>(this IServiceCollection services, Action<IdentityServerOptions> options = null)
             where TUser : class
             where TUserView : class
             where TKey : IEquatable<TKey>
             where TUserService: class, IUserService<TUser, TUserView>
             where TUserEmailService : class, IUserEmailService<TUser>
         {
+            if (options != null)
+            {
+                services.Configure(options);
+            }
+
             services.AddScoped<IUserService<TUser, TUserView>, TUserService>();
             services.AddScoped<IUserEmailService<TUser>, TUserEmailService>();
             return services;

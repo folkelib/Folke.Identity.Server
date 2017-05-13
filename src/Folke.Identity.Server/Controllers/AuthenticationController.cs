@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Folke.Identity.Server.Controllers
 {
@@ -22,6 +23,7 @@ namespace Folke.Identity.Server.Controllers
          where TUserView : class
     {
         private readonly ILogger<AuthenticationController<TUser, TKey, TUserView>> logger;
+        private readonly IOptions<IdentityServerOptions> options;
         protected IUserService<TUser, TUserView> UserService { get; }
         protected UserManager<TUser> UserManager { get; }
         protected SignInManager<TUser> SignInManager { get; }
@@ -31,9 +33,11 @@ namespace Folke.Identity.Server.Controllers
             UserManager<TUser> userManager,
             SignInManager<TUser> signInManager, 
             IUserEmailService<TUser> emailService, 
-            ILogger<AuthenticationController<TUser, TKey, TUserView>> logger)
+            ILogger<AuthenticationController<TUser, TKey, TUserView>> logger,
+            IOptions<IdentityServerOptions> options)
         {
             this.logger = logger;
+            this.options = options;
             UserService = userService;
             SignInManager = signInManager;
             UserManager = userManager;
@@ -97,6 +101,11 @@ namespace Folke.Identity.Server.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest<TUserView>(ModelState);
+            }
+
+            if (!options.Value.RegistrationEnabled)
+            {
+                return BadRequest<TUserView>("Registration is disabled");
             }
 
             var user = UserService.CreateNewUser(registerView.Email, registerView.Email, false);
