@@ -1,7 +1,7 @@
 param([String]$key,[String]$version)
 
 function setProjectVersion([String]$project, [String]$version) {
-	$fileName =  ".\src\$project\$project.xproj"
+	$fileName =  ".\src\$project\$project.csproj"
     $content = (Get-Content $fileName) -join "`n" | ConvertFrom-Json
     $content.version = $version
     $newContent = ConvertTo-Json -Depth 10 $content
