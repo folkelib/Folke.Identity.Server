@@ -8,6 +8,7 @@ using Folke.Identity.Server.Enumeration;
 using Folke.Identity.Server.Services;
 using Folke.Identity.Server.Views;
 using Folke.Mvc.Extensions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -319,9 +320,9 @@ namespace Folke.Identity.Server.Controllers
         }
 
         [HttpGet("external-login-providers")]
-        public IEnumerable<AuthenticationDescription> GetExternalAuthenticationProviders()
+        public async Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationProviders()
         {
-            return SignInManager.GetExternalAuthenticationSchemes();
+            return await SignInManager.GetExternalAuthenticationSchemesAsync();
         }
 
         [HttpGet("external-logins")]
