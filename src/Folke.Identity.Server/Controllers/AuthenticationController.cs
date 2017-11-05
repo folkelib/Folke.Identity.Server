@@ -320,9 +320,9 @@ namespace Folke.Identity.Server.Controllers
         }
 
         [HttpGet("external-login-providers")]
-        public async Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationProviders()
+        public async Task<IEnumerable<AuthenticationSchemeView>> GetExternalAuthenticationProviders()
         {
-            return await SignInManager.GetExternalAuthenticationSchemesAsync();
+            return (await SignInManager.GetExternalAuthenticationSchemesAsync()).Select(x => new AuthenticationSchemeView{ DisplayName = x.DisplayName, Name = x.Name });
         }
 
         [HttpGet("external-logins")]
