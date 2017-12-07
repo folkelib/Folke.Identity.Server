@@ -46,6 +46,22 @@ namespace Folke.Identity.Server.Tests
             Assert.Equal(HttpStatusCode.OK, responseFromLogin.StatusCode);
         }
 
+        [Fact]
+        public async Task RegisterWithUsername()
+        {
+            HttpContent content = new StringContent(JsonConvert.SerializeObject(new { username = "TestUsername", email = "test@test.test", password = "p@sSword20", confirmPassword = "p@sSword20" }), Encoding.UTF8, "application/json");
+            var responseFromRegister = await client.PostAsync("api/authentication/register", content);
+            Assert.Equal(HttpStatusCode.OK, responseFromRegister.StatusCode);
+        }
+
+        [Fact]
+        public async Task RegisterWithoutUsername()
+        {
+            HttpContent content = new StringContent(JsonConvert.SerializeObject(new { email = "test2@test.test", password = "p@sSword21", confirmPassword = "p@sSword21" }), Encoding.UTF8, "application/json");
+            var responseFromRegister = await client.PostAsync("api/authentication/register", content);
+            Assert.Equal(HttpStatusCode.OK, responseFromRegister.StatusCode);
+        }
+
         public class SampleStartup
         {
             public void ConfigureServices(IServiceCollection services)
