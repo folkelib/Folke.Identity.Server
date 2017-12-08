@@ -109,9 +109,7 @@ namespace Folke.Identity.Server.Controllers
                 return BadRequest<TUserView>("Registration is disabled");
             }
 
-            string username = registerView.Username;
-            if (username == null) username = registerView.Email;
-            var user = UserService.CreateNewUser(username, registerView.Email, false);
+            var user = UserService.CreateNewUser(registerView.Username ?? registerView.Email, registerView.Email, false);
             
             var result = await UserManager.CreateAsync(user, registerView.Password);
             if (!result.Succeeded)

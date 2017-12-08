@@ -49,9 +49,14 @@ namespace Folke.Identity.Server.Tests
         [Fact]
         public async Task RegisterWithUsername()
         {
+            // Arrange
             HttpContent content = new StringContent(JsonConvert.SerializeObject(new { username = "TestUsername", email = "test@test.test", password = "p@sSword20", confirmPassword = "p@sSword20" }), Encoding.UTF8, "application/json");
+
+            // Act
             var responseFromRegister = await client.PostAsync("api/authentication/register", content);
-            Assert.Equal(HttpStatusCode.OK, responseFromRegister.StatusCode);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, responseFromRegister.StatusCode);
         }
 
         [Fact]
@@ -59,7 +64,7 @@ namespace Folke.Identity.Server.Tests
         {
             HttpContent content = new StringContent(JsonConvert.SerializeObject(new { email = "test2@test.test", password = "p@sSword21", confirmPassword = "p@sSword21" }), Encoding.UTF8, "application/json");
             var responseFromRegister = await client.PostAsync("api/authentication/register", content);
-            Assert.Equal(HttpStatusCode.OK, responseFromRegister.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, responseFromRegister.StatusCode);
         }
 
         public class SampleStartup
@@ -71,7 +76,7 @@ namespace Folke.Identity.Server.Tests
                 {
                     options.ConnectionString = $"Data Source={temp}.db";
                 });
-                services.AddIdentity<IdentityUser<int>, IdentityRole<int>>();
+                services.AddIdentity<IdentityUser<int>, IdentityRole<int>>().AddDefaultTokenProviders();
                 services.AddMvc().AddIdentityServer<int, IdentityUser<int>, BaseUserView<int>, IdentityRole<int>, BaseRoleView<int>>();
                 services.AddElmIdentity<IdentityUser<int>, IdentityRole<int>, int>();
                 services.AddIdentityServer<IdentityUser<int>, int, EmailService, UserService, BaseUserView<int>>();
