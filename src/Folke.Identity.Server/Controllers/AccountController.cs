@@ -120,7 +120,7 @@ namespace Folke.Identity.Server.Controllers
         {
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", error.Description);
+                ModelState.AddModelError(error.Code, error.Description);
             }
         }
     }
