@@ -49,6 +49,24 @@ namespace Folke.Identity.Server.Controllers
             return BadRequest(ModelState);
         }
 
+        [HttpPut("username")]
+        public async Task<IActionResult> SetUserName([FromBody]ChangeUserNameView view)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var account = await UserService.GetCurrentUserAsync();
+            var result =
+                await UserManager.SetUserNameAsync(account, view.Username);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            AddErrors(result);
+            return BadRequest(ModelState);
+        }
+
         [HttpPost("password")]
         public async Task<IActionResult> SetPassword([FromBody]SetPasswordView model)
         {
