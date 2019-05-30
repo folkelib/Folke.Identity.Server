@@ -5,7 +5,6 @@ namespace Folke.Identity.Server.Views
     public class LoginView
     {
         [Required]
-        [EmailAddress]
         public string Email { get; set; }
 
         [Required]
