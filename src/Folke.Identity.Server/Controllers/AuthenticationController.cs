@@ -194,9 +194,11 @@ namespace Folke.Identity.Server.Controllers
             {
                 user = await UserManager.FindByIdAsync(resetPasswordView.UserId);
             }
-
+            // UserManager.GeneratePasswordResetTokenAsync will sometimes generate "+" characters as part of the long string, which are sent
+            // as whitespace because of URL encoding, failing the token verification. The line below swap blank spaces for "+" as a workaround
+            string code = resetPasswordView.Code.Replace(" ", "+");
             var result =
-                await UserManager.ResetPasswordAsync(user, resetPasswordView.Code, resetPasswordView.Password);
+                await UserManager.ResetPasswordAsync(user, code, resetPasswordView.Password);
             if (!result.Succeeded)
             {
                 AddErrors(result);
